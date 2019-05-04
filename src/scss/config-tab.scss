@@ -2,5 +2,21 @@ video {
   width: 100%;
   display: block;
   max-width: 100%;
-  background: #000;
+  border: 1px solid #f00;
+}
+
+canvas {
+  display: none;
+}
+
+.layout-wrapper {
+  //width: 100px;
+  //height: 100px;
+  overflow: auto;
+}
+#layout {
+  width: 1920px;
+  heighT: 1080px;
+  position: relative;
+  // background: #f00;
 }

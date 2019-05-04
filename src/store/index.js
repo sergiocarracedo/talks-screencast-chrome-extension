@@ -8,14 +8,14 @@ export default new Vuex.Store({
   plugins: [createPersistedState()],
   state: {
     title: 'Test',
+    ug: 'phpvigo',
     cameraInputId: null,
-    audioInputId: null,
-    screenCaptureStream: null
+    audioInputId: null
   },
   mutations: {
     setTitle: (state, payload) => { state.title = payload },
     setAudioInput: (state, payload) => { state.audioInputId = payload },
     setCameraInput: (state, payload) => { state.cameraInputId = payload },
-    setScreenCaptureStream: (state, payload) => { state.screenCaptureStream = payload }
+    setUg: (state, payload) => { state.ug = payload }
   }
 })

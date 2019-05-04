@@ -53,6 +53,17 @@
                 muted
             />
           </v-card>
+
+          <canvas ref="layoutCanvas"></canvas>
+
+          <div class="layout-wrapper">
+            <div ref="layout" id="layout">
+              <component
+                :class="`ug-${ug}`"
+                :is="ug"
+              />
+            </div>
+          </div>
         </v-flex>
       </v-layout>
     </v-container>
@@ -64,10 +75,19 @@
     data: () => ({
       videoInputs: [],
       audioInputs: [],
+      layoutStream: null,
       cameraStream: null,
       screenCaptureStream: null
     }),
     computed: {
+      ug: {
+        get () {
+          return this.$store.state.ug
+        },
+        set (value) {
+          this.$store.commit('setUg', value)
+        }
+      },
       title: {
         get () {
           return this.$store.state.title
@@ -102,11 +122,25 @@
       }
     },
     mounted () {
+      this.createLayoutStream()
       this.getDevices()
       this.setCameraStream()
       this.updatePreview()
     },
     methods: {
+      createLayoutStream () {
+        const canvas = this.$refs['layoutCanvas']
+
+        this.$html2canvas(this.$refs['layout'], {
+          canvas: canvas
+        })
+        this.layoutStream = canvas.captureStream()
+        this.layoutStream.width = 1920
+        this.layoutStream.height = 1080
+        this.layoutStream.fullcanvas = 1
+
+        // this.$refs['captureStreamPreview'].srcObject = this.layoutStream
+      },
       setCameraStream () {
         const deviceId = this.cameraInputId
         const constraints = {
@@ -143,35 +177,33 @@
       updatePreview () {
         const streams = []
 
+        // Add layout
+        streams.push(this.layoutStream)
+
         // Add screen capture steam
         if (this.screenCaptureStream) {
-          this.screenCaptureStream.fullcanvas = 1
-          this.screenCaptureStream.width = 1920
-          this.screenCaptureStream.height = 1080
+          this.screenCaptureStream.top = 60
+          this.screenCaptureStream.left = 0
+          this.screenCaptureStream.width = 1520
+          this.screenCaptureStream.height = 900
           streams.push(this.screenCaptureStream)
         }
 
         // Add camera capture
         if (this.cameraStream) {
-          this.cameraStream.width = 320
-          this.cameraStream.height = 200
-          if (this.screenCaptureStream) {
-            this.cameraStream.top = this.screenCaptureStream.height - this.cameraStream.height
-            this.cameraStream.left = this.screenCaptureStream.width - this.cameraStream.width
-          } else {
-            this.cameraStream.top = 0
-            this.cameraStream.left = 0
-          }
+          this.cameraStream.width = 400
+          this.cameraStream.height = 230
+          this.cameraStream.top = this.layoutStream.height - this.cameraStream.height - 80
+          this.cameraStream.left = this.layoutStream.width - this.cameraStream.width
           streams.push(this.cameraStream)
         }
 
+        console.log(streams)
         if (streams.length > 0) {
           const mixer = new MultiStreamsMixer(streams)
 
           mixer.frameInterval = 1
           mixer.startDrawingFrames()
-
-          console.log(mixer.getMixedStream())
 
           this.$refs['captureStreamPreview'].srcObject = mixer.getMixedStream()
         }
