@@ -10,12 +10,12 @@ export default new Vuex.Store({
     title: 'Test',
     cameraInputId: null,
     audioInputId: null,
-    tabInputId: null
+    screenCaptureStream: null
   },
   mutations: {
     setTitle: (state, payload) => { state.title = payload },
     setAudioInput: (state, payload) => { state.audioInputId = payload },
     setCameraInput: (state, payload) => { state.cameraInputId = payload },
-    setTabInput: (state, payload) => { state.tabInputId = payload }
+    setScreenCaptureStream: (state, payload) => { state.screenCaptureStream = payload }
   }
 })

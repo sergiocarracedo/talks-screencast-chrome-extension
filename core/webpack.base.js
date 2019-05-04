@@ -9,7 +9,7 @@ module.exports = {
   entry: {
     options: resolve('./options'),
     popup: resolve('./popup'),
-    background: resolve('./backend'),
+    background: resolve('./background.js'),
     recordingLayout: resolve('./recording-layout'),
   },
   output: {
@@ -88,8 +88,8 @@ module.exports = {
   plugins: [
     htmlPage('popup', 'popup', ['popup']),
     htmlPage('options', 'options', ['options']),
-    htmlPage('background', 'background', ['background']),
-    htmlPage('recordingLayout', 'recordingLayout', ['recordingLayout']),
+    // htmlPage('background', 'background', ['background']),
+    htmlPage('recording-layout', 'recording-layout', ['recordingLayout']),
     new CopyWebpackPlugin([{ from: path.join(__dirname, '..', 'static') }]),
     new ChromeReloadPlugin({
       port: 9090,

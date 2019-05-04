@@ -35,19 +35,27 @@
     },
     mounted () {
       this.setSecondaryStream(this.cameraInputId)
-      console.log(this.$store.state)
       this.setMainStream(this.tabInputId)
+      this.captureTab()
     },
     methods: {
+      captureTab () {
+        chrome.tabCapture.capture(
+          {
+            audio: false,
+            video: true
+          },
+          (stream) => {
+            this.$store.commit('setTabCaptureStream', stream)
+          }
+        )
+      },
       setSecondaryStream: function (deviceId) {
         const constraints = {
           video: {
             deviceId: {exact: deviceId}
           }
         }
-
-        console.log('deviceId', deviceId)
-
         navigator.mediaDevices.getUserMedia(constraints)
           .then(stream => {
             this.$refs['secondaryVideoStream'].srcObject = stream

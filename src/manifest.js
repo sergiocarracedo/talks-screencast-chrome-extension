@@ -15,16 +15,15 @@ module.exports = {
     'background',
     'unlimitedStorage',
     'storage',
-    'notifications',
     'desktopCapture'
   ],
   browser_action: {
-    default_title: 'title',
-    default_popup: 'pages/popup.html'
+    default_title: 'title'
+    // default_popup: 'pages/popup.html'
   },
   background: {
     persistent: false,
-    page: 'pages/background.html'
+    scripts: ['js/background.js']
   },
   options_page: 'pages/options.html',
   content_security_policy: "script-src 'self' 'unsafe-eval'; object-src 'self'",

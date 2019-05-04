@@ -8,11 +8,11 @@
 
     <v-container grid-list-md>
       <v-layout justify-center>
-        <v-flex xs12 sm8 md6>
+        <v-flex xs12 sm8 md8>
           <v-card>
             <v-card-text>
               <v-layout row wrap>
-                <v-flex xs12 sm6>
+                <v-flex xs12 sm4>
                   <v-select
                       :items="videoInputs"
                       v-model="cameraInputId"
@@ -21,7 +21,8 @@
                       label="Camera"
                       @change="setCameraStream"
                   />
-
+                </v-flex>
+                <v-flex xs12 sm4>
                   <v-select
                       :items="audioInputs"
                       v-model="audioInputId"
@@ -30,58 +31,27 @@
                       label="Audio"
 
                   />
-
-
                 </v-flex>
-                <v-flex xs12 sm6>
-                  <video
-                      autoplay="true"
-                      ref="cameraStreamPreview"
-                      class="camera-preview"
-                      muted
-                  />
-                </v-flex>
-              </v-layout>
-              <v-layout row wrap>
-                <v-flex xs12 sm6>
-                  <v-btn @click="selectTab">
+                <v-flex xs12 sm4>
+                  <v-btn
+                      color="primary"
+                      @click="selectTab"
+                  >
                     Select tab to record
                   </v-btn>
-
-                  <v-list two-line>
-                    <template v-for="(item, index) in tabs">
-                      <v-list-tile
-                          :key="item.id"
-                          avatar
-                          @click=""
-                      >
-                        <v-list-tile-avatar>
-                          <img :src="item.favIconUrl">
-                        </v-list-tile-avatar>
-
-                        <v-list-tile-content>
-                          <v-list-tile-title v-html="item.title"></v-list-tile-title>
-                          <v-list-tile-sub-title v-html="item.url"></v-list-tile-sub-title>
-                        </v-list-tile-content>
-                      </v-list-tile>
-                    </template>
-                  </v-list>
-
-
-
-
-
-                </v-flex>
-                <v-flex xs12 sm6>
-                  <video
-                      autoplay="true"
-                      ref="tabCaptureStreamPreview"
-                      class="tab-capture-preview"
-                      muted
-                  />
                 </v-flex>
               </v-layout>
             </v-card-text>
+          </v-card>
+
+
+          <v-card>
+            <video
+                autoplay="true"
+                ref="captureStreamPreview"
+                class="capture-preview"
+                muted
+            />
           </v-card>
         </v-flex>
       </v-layout>
@@ -89,11 +59,13 @@
   </v-app>
 </template>
 <script>
+  import MultiStreamsMixer from 'multistreamsmixer'
   export default {
     data: () => ({
       videoInputs: [],
       audioInputs: [],
-      tabs: []
+      cameraStream: null,
+      screenCaptureStream: null
     }),
     computed: {
       title: {
@@ -121,17 +93,33 @@
         }
       }
     },
-    created () {
+    watch: {
+      screenCaptureStream (newVal, oldVal) {
+        this.updatePreview()
+      },
+      cameraStream (newVal, oldVal) {
+        this.updatePreview()
+      }
     },
     mounted () {
       this.getDevices()
       this.setCameraStream()
-      this.getTabs()
-
-      alert(chrome.extension.getURL('pages/background.html'))
+      this.updatePreview()
     },
     methods: {
-      getDevices: function () {
+      setCameraStream () {
+        const deviceId = this.cameraInputId
+        const constraints = {
+          video: {
+            deviceId: {exact: deviceId}
+          }
+        }
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then(stream => {
+            this.cameraStream = stream
+          })
+      },
+      getDevices () {
         navigator.mediaDevices.enumerateDevices()
           .then((devices) => {
             devices.forEach((device, key) => {
@@ -152,48 +140,59 @@
             })
           })
       },
-      setCameraStream: function () {
-        const constraints = {
-          video: {
-            deviceId: {exact: this.cameraInputId}
-          },
-          audio: {
-            deviceId: {exact: this.audioInputId}
-          }
-        }
-        navigator.mediaDevices.getUserMedia(constraints)
-          .then(stream => {
-            this.$refs['cameraStreamPreview'].srcObject = stream
-          })
-          .catch(() => {})
-      },
-      setTabStream: function (streamId) {
-        const constraints = {
-          audio: false,
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: streamId
-            }
-          }
+      updatePreview () {
+        const streams = []
+
+        // Add screen capture steam
+        if (this.screenCaptureStream) {
+          this.screenCaptureStream.fullcanvas = 1
+          this.screenCaptureStream.width = 1920
+          this.screenCaptureStream.height = 1080
+          streams.push(this.screenCaptureStream)
         }
 
-        navigator.mediaDevices.getUserMedia(constraints)
-          .then(stream => {
-            console.log('Stream', stream)
-            this.$refs['tabCaptureStreamPreview'].srcObject = stream
-          })
-          .catch(error => console.log(error, error.message))
-      },
-      getTabs () {
-        chrome.tabs.query({}, (tabs) => {
-          this.tabs = tabs
-        })
+        // Add camera capture
+        if (this.cameraStream) {
+          this.cameraStream.width = 320
+          this.cameraStream.height = 200
+          if (this.screenCaptureStream) {
+            this.cameraStream.top = this.screenCaptureStream.height - this.cameraStream.height
+            this.cameraStream.left = this.screenCaptureStream.width - this.cameraStream.width
+          } else {
+            this.cameraStream.top = 0
+            this.cameraStream.left = 0
+          }
+          streams.push(this.cameraStream)
+        }
+
+        if (streams.length > 0) {
+          const mixer = new MultiStreamsMixer(streams)
+
+          mixer.frameInterval = 1
+          mixer.startDrawingFrames()
+
+          console.log(mixer.getMixedStream())
+
+          this.$refs['captureStreamPreview'].srcObject = mixer.getMixedStream()
+        }
       },
       selectTab () {
         chrome.desktopCapture.chooseDesktopMedia(['tab', 'window', 'screen'], (streamId) => {
-          this.$store.commit('setTabInput', streamId)
-          this.setTabStream(streamId)
+          const constraints = {
+            audio: false,
+            video: {
+              mandatory: {
+                chromeMediaSource: 'desktop',
+                chromeMediaSourceId: streamId
+              }
+            }
+          }
+
+          navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+              this.screenCaptureStream = stream
+            })
+            .catch(error => console.log(error, error.message))
         })
       }
     }
