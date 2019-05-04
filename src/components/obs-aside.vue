@@ -13,7 +13,7 @@
     ],
     computed: {
       showClock () {
-        return true // this.$store.state.settings.showClock
+        return this.$store.state.showClock
       }
     }
   }

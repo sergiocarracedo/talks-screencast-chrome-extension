@@ -9,41 +9,28 @@
     <v-container grid-list-md>
       <v-layout justify-center>
         <v-flex xs12 sm8 md8>
-          <v-card>
-            <v-card-text>
-              <v-layout row wrap>
-                <v-flex xs12 sm4>
-                  <v-select
-                      :items="videoInputs"
-                      v-model="cameraInputId"
-                      item-text="label"
-                      item-value="id"
-                      label="Camera"
-                      @change="setCameraStream"
-                  />
-                </v-flex>
-                <v-flex xs12 sm4>
-                  <v-select
-                      :items="audioInputs"
-                      v-model="audioInputId"
-                      item-text="label"
-                      item-value="id"
-                      label="Audio"
-
-                  />
-                </v-flex>
-                <v-flex xs12 sm4>
-                  <v-btn
-                      color="primary"
-                      @click="selectTab"
-                  >
-                    Select tab to record
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </v-card-text>
-          </v-card>
-
+          <v-tabs color="primary" dark>
+            <v-tab ripple>
+              Sources and Settings
+            </v-tab>
+            <v-tab ripple>
+              Talks
+            </v-tab>
+            <v-tab ripple>
+              About
+            </v-tab>
+            <v-tab-item>
+              <settings
+                @onScreenCaptureStream="onScreenCaptureStream"
+              />
+            </v-tab-item>
+            <v-tab-item>
+              <talks />
+            </v-tab-item>
+            <v-tab-item>
+              About
+            </v-tab-item>
+          </v-tabs>
 
           <v-card>
             <video
@@ -71,10 +58,15 @@
 </template>
 <script>
   import MultiStreamsMixer from 'multistreamsmixer'
+  import Settings from './Settings'
+  import Talks from './Talks'
+
   export default {
+    components: {
+      Settings,
+      Talks
+    },
     data: () => ({
-      videoInputs: [],
-      audioInputs: [],
       layoutStream: null,
       cameraStream: null,
       screenCaptureStream: null
@@ -96,24 +88,17 @@
           this.$store.commit('setTitle', value)
         }
       },
-      audioInputId: {
-        get () {
-          return this.$store.state.audioInputId
-        },
-        set (value) {
-          this.$store.commit('setAudioInput', value)
-        }
+      audioInputId () {
+        return this.$store.state.audioInputId
       },
-      cameraInputId: {
-        get () {
-          return this.$store.state.cameraInputId
-        },
-        set (value) {
-          this.$store.commit('setCameraInput', value)
-        }
+      cameraInputId () {
+        return this.$store.state.cameraInputId
       }
     },
     watch: {
+      cameraInputId (deviceId) {
+        this.setCameraStream(deviceId)
+      },
       screenCaptureStream (newVal, oldVal) {
         this.updatePreview()
       },
@@ -123,17 +108,20 @@
     },
     mounted () {
       this.createLayoutStream()
-      this.getDevices()
       this.setCameraStream()
       this.updatePreview()
     },
     methods: {
+      onScreenCaptureStream (stream) {
+        this.screenCaptureStream = stream
+      },
       createLayoutStream () {
         const canvas = this.$refs['layoutCanvas']
 
-        this.$html2canvas(this.$refs['layout'], {
-          canvas: canvas
-        })
+        this.updateCanvas()
+
+        setInterval(this.updateCanvas, 5000)
+
         this.layoutStream = canvas.captureStream()
         this.layoutStream.width = 1920
         this.layoutStream.height = 1080
@@ -141,8 +129,13 @@
 
         // this.$refs['captureStreamPreview'].srcObject = this.layoutStream
       },
-      setCameraStream () {
-        const deviceId = this.cameraInputId
+      updateCanvas () {
+        const canvas = this.$refs['layoutCanvas']
+        this.$html2canvas(this.$refs['layout'], {
+          canvas: canvas
+        })
+      },
+      setCameraStream (deviceId) {
         const constraints = {
           video: {
             deviceId: {exact: deviceId}
@@ -151,27 +144,6 @@
         navigator.mediaDevices.getUserMedia(constraints)
           .then(stream => {
             this.cameraStream = stream
-          })
-      },
-      getDevices () {
-        navigator.mediaDevices.enumerateDevices()
-          .then((devices) => {
-            devices.forEach((device, key) => {
-              switch (device.kind) {
-                case 'audioinput':
-                  this.audioInputs.push({
-                    id: device.deviceId,
-                    label: device.label || `Microphone: ${device.deviceId}`
-                  })
-                  break
-                case 'videoinput':
-                  this.videoInputs.push({
-                    id: device.deviceId,
-                    label: device.label || `Video: ${device.deviceId}`
-                  })
-                  break
-              }
-            })
           })
       },
       updatePreview () {
@@ -207,30 +179,7 @@
 
           this.$refs['captureStreamPreview'].srcObject = mixer.getMixedStream()
         }
-      },
-      selectTab () {
-        chrome.desktopCapture.chooseDesktopMedia(['tab', 'window', 'screen'], (streamId) => {
-          const constraints = {
-            audio: false,
-            video: {
-              mandatory: {
-                chromeMediaSource: 'desktop',
-                chromeMediaSourceId: streamId
-              }
-            }
-          }
-
-          navigator.mediaDevices.getUserMedia(constraints)
-            .then(stream => {
-              this.screenCaptureStream = stream
-            })
-            .catch(error => console.log(error, error.message))
-        })
       }
     }
   }
 </script>
-
-<style>
-
-</style>

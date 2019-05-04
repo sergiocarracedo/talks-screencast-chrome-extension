@@ -1,7 +1,7 @@
 <template>
   <div id="phpvigo">
     <obs-header
-        :title="meetup.title"
+        :title="meetupTitle"
         :logo="true"
     ></obs-header>
 

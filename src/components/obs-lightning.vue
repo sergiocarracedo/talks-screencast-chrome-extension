@@ -1,7 +1,7 @@
 <template>
   <div id="lightning">
     <div class="lightning-logo"></div>
-    <obs-timer :time="time"></obs-timer>
+    <!--<obs-timer :time="time"></obs-timer>-->
   </div>
 </template>
 
@@ -12,7 +12,7 @@
     name: 'obs-lightning',
     computed: {
       time () {
-        let duration = moment.duration('00:' + this.$store.state.settings.lightningDuration).asSeconds()
+        let duration = moment.duration('00:' + this.$store.state.lightningDuration).asSeconds()
         if (duration === undefined) {
           duration = 300
         }

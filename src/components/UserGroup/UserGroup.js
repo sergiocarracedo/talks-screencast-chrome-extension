@@ -2,14 +2,14 @@
 
 export default {
   computed: {
-    meetup () {
-      return 'Test' // this.$store.state.settings.meetup;
+    meetupTitle () {
+      return this.$store.state.meetupTitle
     },
     currentTalk () {
-      return 'Talk' // this.$store.state.talks.currentTalk;
+      return this.$store.state.talks.currentTalk
     }
   },
   mounted () {
-    // this.$store.dispatch(types.ACTION_SET_CURRENT_TALK);
+    this.$store.dispatch('setCurrentTalk')
   }
 }

@@ -3,7 +3,7 @@
     <div class="countdown">
       <i class="fa fa-clock-o"></i> {{ countdown }}
     </div>
-    <div class="buttonset">
+    <!--<div class="buttonset">
       <md-button v-show="!interval && seconds != 0" class="md-icon-button md-dense" @click.native="start()">
         <i class="fa fa-play"></i>
       </md-button>
@@ -18,7 +18,7 @@
       <md-button class="md-icon-button md-dense" @click.native="reset()">
         <i class="fa fa-refresh"></i>
       </md-button>
-    </div>
+    </div>-->
 
     <div v-if="isExtended" class="extended">
       <p>Extended time</p>
