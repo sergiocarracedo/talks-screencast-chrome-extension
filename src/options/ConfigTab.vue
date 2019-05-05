@@ -28,7 +28,7 @@
               <talks />
             </v-tab-item>
             <v-tab-item>
-              About
+              <about />
             </v-tab-item>
           </v-tabs>
 
@@ -96,11 +96,13 @@
   import MultiStreamsMixer from 'multistreamsmixer'
   import Settings from './Settings'
   import Talks from './Talks'
+  import About from './About'
 
   export default {
     components: {
       Settings,
-      Talks
+      Talks,
+      About
     },
     data: () => ({
       preview: true,
