@@ -22,3 +22,9 @@ El germen de ste proyecto es una idea de [David Ibañez](https://github.com/diba
 
 # Screenshots
 
+* Main tab
+![Main tab](https://raw.githubusercontent.com/sergiocarracedo/talks-screencast-chrome-extension/master/github/screenshot01.jpg)
+
+* Talks 
+![Tabs detail](https://raw.githubusercontent.com/sergiocarracedo/talks-screencast-chrome-extension/master/github/screenshot02.jpg)
+
