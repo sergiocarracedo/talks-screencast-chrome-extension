@@ -17,7 +17,7 @@ El germen de ste proyecto es una idea de [David Ibañez](https://github.com/diba
 - Añadir plantillas de layout para más grupos
 - Permitir seleccionar formato de grabación
 - i18n
-- Impedir el cierre de la pestaña cuando se esta grabando
+- ~~Impedir el cierre de la pestaña cuando se esta grabando~~
 
 
 

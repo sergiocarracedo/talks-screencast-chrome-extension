@@ -36,7 +36,7 @@
           <v-select
             v-model="ug"
             label="User group"
-            :options="ugs"
+            :items="ugList"
           />
         </v-flex>
         <v-flex xs12 sm4>
@@ -65,6 +65,9 @@
       audioInputs: []
     }),
     computed: {
+      ugList () {
+        return this.$store.state.ugList
+      },
       audioInputId: {
         get () {
           return this.$store.state.audioInputId

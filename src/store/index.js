@@ -8,6 +8,7 @@ Vue.use(Vuex)
 const state = {
   title: 'Test',
   ug: 'phpvigo',
+  ugList: [],
   cameraInputId: null,
   audioInputId: null,
   meetupTitle: 'Meetup title',
@@ -20,6 +21,7 @@ const mutations = {
   setAudioInput: (state, payload) => { state.audioInputId = payload },
   setCameraInput: (state, payload) => { state.cameraInputId = payload },
   setUg: (state, payload) => { state.ug = payload },
+  setUgList: (state, payload) => { state.ugList = payload },
   setTalks: (state, payload) => { state.talks = payload },
   setShowClock: (state, payload) => {
     console.log(state)

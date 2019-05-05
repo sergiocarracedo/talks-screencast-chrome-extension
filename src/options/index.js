@@ -29,8 +29,10 @@ Vue.component('obs-clock', require('../components/obs-clock.vue').default)
 
 Vue.config.productionTip = false
 /* eslint-disable no-new */
-new Vue({
+const app = new Vue({
   el: '#root',
   render: h => h(root),
   store
 })
+
+app.$store.commit('setUgList', ugList)

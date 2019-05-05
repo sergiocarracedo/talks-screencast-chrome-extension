@@ -167,6 +167,9 @@
         }
       }
     },
+    created () {
+      window.onbeforeunload = this.closeHandler
+    },
     mounted () {
       this.createPreview()
     },
@@ -304,7 +307,6 @@
           this.audioStream.width = 0
           this.audioStream.height = 0
           streams.push(this.audioStream)
-          console.log(this.audioStream)
         }
 
         if (streams.length > 0) {
@@ -325,6 +327,16 @@
           this.mixer.frameInterval = 1
           this.mixer.startDrawingFrames()
         }
+      },
+      closeHandler (e) {
+        // if (this.recording) {
+        e = e || window.event
+
+        if (e) {
+          e.returnValue = 'Sure?'
+        }
+        return 'Close this tab cancel recording. Are you sure?'
+        // }
       }
     }
   }
