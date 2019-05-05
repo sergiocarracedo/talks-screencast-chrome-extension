@@ -109,6 +109,7 @@
       recording: false,
       layoutStream: null,
       cameraStream: null,
+      audioStream: null,
       screenCaptureStream: null,
       mixer: null,
       mixedStream: null,
@@ -150,6 +151,9 @@
       cameraStream (newVal, oldVal) {
         this.updatePreview()
       },
+      audioStream (newVal, oldVal) {
+        this.updatePreview()
+      },
       preview (newVal) {
         if (newVal) {
           this.createPreview()
@@ -167,6 +171,9 @@
     },
     methods: {
       startRecording () {
+        // Clear buffer
+        this.buffer = []
+
         const options = {
           mimeType: 'video/webm',
           video: {
@@ -184,7 +191,6 @@
       },
       stopRecording () {
         this.mediaRecorder.stop()
-        console.log(this.mediaRecorder)
       },
       onStopRecording (e) {
         this.recording = false
@@ -202,8 +208,8 @@
       },
       createPreview () {
         this.createLayoutStream()
-        this.setCameraStream()
-        console.log('createPreview')
+        this.setCameraStream(this.cameraInputId)
+        this.setAudioStream(this.audioInputId)
         this.updatePreview()
       },
       destroyPreview () {
@@ -253,6 +259,17 @@
             this.cameraStream = stream
           })
       },
+      setAudioStream (deviceId) {
+        const constraints = {
+          audio: {
+            deviceId: {exact: deviceId}
+          }
+        }
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then(stream => {
+            this.audioStream = stream
+          })
+      },
       updatePreview () {
         const streams = []
 
@@ -277,6 +294,14 @@
           streams.push(this.cameraStream)
         }
 
+        // Add audio
+        if (this.audioStream) {
+          this.audioStream.width = 0
+          this.audioStream.height = 0
+          streams.push(this.audioStream)
+          console.log(this.audioStream)
+        }
+
         if (streams.length > 0) {
           if (this.mixer === null) {
             this.mixer = new MultiStreamsMixer(streams)
@@ -284,6 +309,12 @@
             this.$refs['captureStreamPreview'].srcObject = this.mixedStream
           } else {
             this.mixer.resetVideoStreams(streams)
+          }
+
+          // Add audio
+          if (this.audioStream) {
+            this.mixedStream.getAudioTracks().forEach(track => track.stop())
+            this.mixedStream.addTrack(this.audioStream.getAudioTracks()[0])
           }
 
           this.mixer.frameInterval = 1
