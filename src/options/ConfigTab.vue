@@ -33,13 +33,18 @@
           </v-tabs>
 
           <v-card class="mb-5">
-            <v-card-text>
+            <v-card-title>
+              <h5 class="headline">
+                Preview
+              </h5>
+            </v-card-title>
+            <!--<v-card-text>
               <v-switch
                   v-model="preview"
                   color="primary"
                   label="Preview"
               ></v-switch>
-            </v-card-text>
+            </v-card-text>-->
 
             <video
                 autoplay="true"
@@ -235,7 +240,7 @@
         const canvas = this.$refs['layoutCanvas']
 
         this.updateCanvas()
-        setInterval(this.updateCanvas, 5000)
+        setInterval(this.updateCanvas, 1000)
 
         this.layoutStream = canvas.captureStream()
         this.layoutStream.width = 1920

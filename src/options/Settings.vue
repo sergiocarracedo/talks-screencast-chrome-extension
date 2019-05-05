@@ -33,15 +33,16 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12 sm4>
-          <v-text-field
-            v-model="meetupTitle"
-            label="Meetup Title"
+          <v-select
+            v-model="ug"
+            label="User group"
+            :options="ugs"
           />
         </v-flex>
         <v-flex xs12 sm4>
           <v-text-field
-            v-model="lightningDuration"
-            label="Lightning Duration"
+            v-model="meetupTitle"
+            label="Meetup Title"
           />
         </v-flex>
         <v-flex xs12 sm4>
@@ -102,6 +103,14 @@
         },
         set (value) {
           this.$store.commit('setLightningDuration', value)
+        }
+      },
+      ug: {
+        get () {
+          return this.$store.state.ug
+        },
+        set (value) {
+          this.$store.commit('setUg', value)
         }
       }
     },
