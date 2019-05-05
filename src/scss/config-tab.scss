@@ -2,7 +2,7 @@ video {
   width: 100%;
   display: block;
   max-width: 100%;
-  border: 1px solid #f00;
+  border: 1px solid #ddd;
 }
 
 canvas {
@@ -10,13 +10,12 @@ canvas {
 }
 
 .layout-wrapper {
-  //width: 100px;
-  //height: 100px;
+  width: 1px;
+  height: 1px;
   overflow: auto;
 }
 #layout {
   width: 1920px;
-  heighT: 1080px;
+  height: 1080px;
   position: relative;
-  // background: #f00;
 }
