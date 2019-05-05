@@ -20,4 +20,5 @@ El germen de ste proyecto es una idea de [David Ibañez](https://github.com/diba
 - ~~Impedir el cierre de la pestaña cuando se esta grabando~~
 
 
+# Screenshots
 
