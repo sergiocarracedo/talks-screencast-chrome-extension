@@ -6,7 +6,7 @@ import VueHtml2Canvas from 'vue-html2canvas'
 import store from '../store'
 import ugComponents from '../components/UserGroup'
 import 'vuetify/dist/vuetify.min.css'
-import '../scss/config-tab.scss'
+import './config-tab.scss'
 
 Vue.use(Vuetify)
 Vue.use(VueHtml2Canvas)
@@ -18,8 +18,6 @@ for (let ugComponent in ugComponents) {
   ugList.push(ugComponents[ugComponent].name)
 }
 
-// Vue.component('settings-dialog', require('../components/Settings/SettingsDialog.vue').default)
-// Vue.component('about-dialog', require('../components/About/AboutDialog.vue').default)
 Vue.component('obs-header', require('../components/obs-header.vue').default)
 Vue.component('obs-footer', require('../components/obs-footer.vue').default)
 Vue.component('obs-aside', require('../components/obs-aside.vue').default)
