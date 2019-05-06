@@ -37,14 +37,9 @@
               <h5 class="headline">
                 Preview
               </h5>
+              <v-spacer></v-spacer>
+              {{ parseInt(audioLevel) }} <v-icon>volume_up</v-icon>
             </v-card-title>
-            <!--<v-card-text>
-              <v-switch
-                  v-model="preview"
-                  color="primary"
-                  label="Preview"
-              ></v-switch>
-            </v-card-text>-->
 
             <video
                 autoplay="true"
@@ -69,10 +64,10 @@
               >
                 <v-icon>stop</v-icon> Stop recording
               </v-btn>
-              &nbsp;
-              <v-icon>volume_up</v-icon> {{ parseInt(audioLevel) }}
 
-              <v-spacer></v-spacer>
+              <v-spacer />
+              {{ recordingTime }}
+              <v-spacer />
 
               <v-btn
                   :href="file"
@@ -100,6 +95,7 @@
   </v-app>
 </template>
 <script>
+  import moment from 'moment'
   import MultiStreamsMixer from 'multistreamsmixer'
   import Settings from './Settings'
   import Talks from './Talks'
@@ -114,6 +110,10 @@
     data: () => ({
       preview: true,
       recording: false,
+      recordingStartTime: null,
+      recordingStopTime: null,
+      recordingTime: '00:00:00',
+      recordingInterval: null,
       layoutStream: null,
       cameraStream: null,
       audioStream: null,
@@ -203,12 +203,24 @@
         this.mediaRecorder.start()
 
         this.recording = true
+        this.recordingStartTime = new Date()
+        clearInterval(this.recordingInterval)
+        this.recordingInterval = setInterval(this.recordingTimeUpdate, 1000)
       },
       stopRecording () {
         this.mediaRecorder.stop()
       },
+      recordingTimeUpdate () {
+        const d = moment.duration(moment(new Date()).diff(this.recordingStartTime)).asSeconds()
+        const h = ('0' + parseInt(d / 3600)).slice(-2)
+        const m = ('0' + parseInt((d / 60) % 60)).slice(-2)
+        const s = ('0' + parseInt(d % 60)).slice(-2)
+        this.recordingTime = `${h}:${m}:${s}`
+      },
       onStopRecording (e) {
+        clearInterval(this.recordingInterval)
         this.recording = false
+        this.recordingStopTime = new Date()
 
         const blob = new Blob(this.buffer, {
           type: 'video/webm'
@@ -371,3 +383,4 @@
     }
   }
 </script>
+
