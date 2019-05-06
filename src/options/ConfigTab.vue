@@ -69,6 +69,8 @@
               >
                 <v-icon>stop</v-icon> Stop recording
               </v-btn>
+              &nbsp;
+              <v-icon>volume_up</v-icon> {{ parseInt(audioLevel) }}
 
               <v-spacer></v-spacer>
 
@@ -120,7 +122,8 @@
       mixedStream: null,
       mediaRecorder: null,
       buffer: [],
-      file: null
+      file: null,
+      audioLevel: 0
     }),
     computed: {
       ug: {
@@ -150,6 +153,9 @@
       cameraInputId (deviceId) {
         this.setCameraStream(deviceId)
       },
+      audioInputId (deviceId) {
+        this.setAudioStream(deviceId)
+      },
       screenCaptureStream (newVal, oldVal) {
         this.updatePreview()
       },
@@ -157,6 +163,7 @@
         this.updatePreview()
       },
       audioStream (newVal, oldVal) {
+        console.log('watcher audiostream')
         this.updatePreview()
       },
       preview (newVal) {
@@ -243,7 +250,7 @@
         const canvas = this.$refs['layoutCanvas']
 
         this.updateCanvas()
-        setInterval(this.updateCanvas, 1000)
+        setInterval(this.updateCanvas, 1500)
 
         this.layoutStream = canvas.captureStream()
         this.layoutStream.width = 1920
@@ -275,7 +282,9 @@
         }
         navigator.mediaDevices.getUserMedia(constraints)
           .then(stream => {
-            this.audioStream = stream
+            if (this.audioStream === null) {
+              this.audioStream = stream
+            }
           })
       },
       updatePreview () {
@@ -302,13 +311,6 @@
           streams.push(this.cameraStream)
         }
 
-        // Add audio
-        if (this.audioStream) {
-          this.audioStream.width = 0
-          this.audioStream.height = 0
-          streams.push(this.audioStream)
-        }
-
         if (streams.length > 0) {
           if (this.mixer === null) {
             this.mixer = new MultiStreamsMixer(streams)
@@ -320,8 +322,36 @@
 
           // Add audio
           if (this.audioStream) {
-            this.mixedStream.getAudioTracks().forEach(track => track.stop())
+            console.log('audiostream')
+            this.mixedStream.getAudioTracks().forEach(track => this.mixedStream.removeTrack(track))
             this.mixedStream.addTrack(this.audioStream.getAudioTracks()[0])
+
+            console.log('tracks', this.mixedStream.getTracks())
+
+            const audioContext = new AudioContext()
+            const analyser = audioContext.createAnalyser()
+            const microphone = audioContext.createMediaStreamSource(this.audioStream)
+            const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
+
+            analyser.smoothingTimeConstant = 0.8
+            analyser.fftSize = 1024
+
+            microphone.connect(analyser)
+            analyser.connect(javascriptNode)
+            javascriptNode.connect(audioContext.destination)
+
+            javascriptNode.onaudioprocess = () => {
+              const array = new Uint8Array(analyser.frequencyBinCount)
+              analyser.getByteFrequencyData(array)
+              let values = 0
+
+              const length = array.length
+              for (let i = 0; i < length; i++) {
+                values += (array[i])
+              }
+
+              this.audioLevel = values / length
+            }
           }
 
           this.mixer.frameInterval = 1
@@ -329,14 +359,14 @@
         }
       },
       closeHandler (e) {
-        // if (this.recording) {
-        e = e || window.event
+        if (this.recording) {
+          e = e || window.event
 
-        if (e) {
-          e.returnValue = 'Sure?'
+          if (e) {
+            e.returnValue = 'Sure?'
+          }
+          return 'Close this tab cancel recording. Are you sure?'
         }
-        return 'Close this tab cancel recording. Are you sure?'
-        // }
       }
     }
   }
