@@ -13,7 +13,8 @@ const state = {
   audioInputId: null,
   meetupTitle: 'Meetup title',
   showClock: true,
-  lightningDuration: '5:00'
+  lightningDuration: '5:00',
+  recording: false
 }
 
 const mutations = {
@@ -28,7 +29,8 @@ const mutations = {
     state.showClock = payload
   },
   setMeetupTitle: (state, payload) => { state.meetupTitle = payload },
-  setLightningDuration: (state, payload) => { state.lightningDuration = payload }
+  setLightningDuration: (state, payload) => { state.lightningDuration = payload },
+  setRecordingStatus: (state, payload) => { state.recording = payload }
 }
 
 export default new Vuex.Store({

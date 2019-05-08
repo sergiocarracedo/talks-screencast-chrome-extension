@@ -32,11 +32,13 @@
             </v-tab-item>
           </v-tabs>
 
-          <!--<stream-mixer
+          <stream-mixer
+            :layoutStream="layoutStream"
             :cameraStream="cameraStream"
             :audioStream="audioStream"
             :screenCaptureStream="screenCaptureStream"
-          />-->
+            @recordingStatusChange="onRecordingStatusChange"
+          />
 
           <stream-layout
             :ug="ug"
@@ -65,7 +67,6 @@
     },
     data: () => ({
       preview: true,
-      recording: false,
       cameraStream: null,
       audioStream: null,
       layoutStream: null,
@@ -93,6 +94,9 @@
       },
       cameraInputId () {
         return this.$store.state.cameraInputId
+      },
+      recording () {
+        return this.$store.state.recording
       }
     },
     watch: {
@@ -113,11 +117,13 @@
     created () {
       window.onbeforeunload = this.closeHandler
     },
-    mounted () {},
     methods: {
       onCreateLayoutStream (layoutStream) {
         this.layoutStream = layoutStream
         this.createOrUpdateStreams()
+      },
+      onRecordingStatusChange (recordingStatus) {
+        this.recording = recordingStatus
       },
       createOrUpdateStreams () {
         this.setCameraStream(this.cameraInputId)
