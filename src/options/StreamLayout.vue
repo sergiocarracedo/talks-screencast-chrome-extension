@@ -14,6 +14,8 @@
 </template>
 
 <script>
+  import _ from 'lodash'
+
   export default {
     name: 'video-layout',
     props: {
@@ -24,6 +26,47 @@
     data: () => ({
       layoutStream: null
     }),
+    computed: {
+      showClock () {
+        return this.$store.state.showClock
+      },
+      ug () {
+        return this.$store.state.ug
+      },
+      meetupTitle () {
+        return this.$store.state.meetupTitle
+      },
+      talks () {
+        return this.$store.state.talks.talks
+      },
+      currentTalk () {
+        return this.$store.state.talks.currentTalk
+      }
+    },
+    watch: {
+      showClock () {
+        this.updateCanvas()
+      },
+      ug () {
+        this.updateCanvas()
+      },
+      meetupTitle: {
+        handler: _.debounce(function () {
+          this.updateCanvas()
+        }, 1000)
+      },
+      talks: {
+        handler: _.debounce(function () {
+          this.updateCanvas()
+        }, 1000),
+        deep: true
+      },
+      currentTalk: {
+        handler: _.debounce(function () {
+          this.updateCanvas()
+        }, 1000)
+      }
+    },
     mounted () {
       this.createLayoutStream()
     },

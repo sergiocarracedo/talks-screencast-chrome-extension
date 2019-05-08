@@ -81,7 +81,6 @@
       stopRecording () {
         this.mediaRecorder.stop()
         this.$store.commit('setRecordingStatus', false)
-        this.$refs['downloadButton'].click()
       },
       recordingTimeUpdate () {
         const d = moment.duration(moment(new Date()).diff(this.recordingStartTime)).asSeconds()
@@ -89,6 +88,15 @@
         const m = ('0' + parseInt((d / 60) % 60)).slice(-2)
         const s = ('0' + parseInt(d % 60)).slice(-2)
         this.recordingTime = `${h}:${m}:${s}`
+      },
+      forceDownload () {
+        const element = document.createElement('a')
+        element.setAttribute('href', this.file)
+        element.setAttribute('download', 'meetup.webm')
+        element.style.display = 'none'
+        document.body.appendChild(element)
+        element.click()
+        document.body.removeChild(element)
       },
       onStopRecording (e) {
         clearInterval(this.recordingInterval)
@@ -100,6 +108,7 @@
         })
 
         this.file = URL.createObjectURL(blob)
+        this.forceDownload()
       },
       onDataAvailable (e) {
         if (e.data) {
