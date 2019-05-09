@@ -15,7 +15,6 @@
               :cameraStream="cameraStream"
               :audioStream="audioStream"
               :screenCaptureStream="screenCaptureStream"
-              @recordingStatusChange="onRecordingStatusChange"
           />
 
 
@@ -43,7 +42,6 @@
           </v-tabs>
 
           <stream-layout
-            :ug="ug"
             @createLayoutStream="onCreateLayoutStream"
           />
 
@@ -120,6 +118,11 @@
       window.onbeforeunload = this.closeHandler
     },
     methods: {
+      stopAllTracks (stream) {
+        if (stream instanceof MediaStream) {
+          stream.getTracks().forEach(track => track.stop())
+        }
+      },
       onCreateLayoutStream (layoutStream) {
         this.layoutStream = layoutStream
         this.createOrUpdateStreams()
@@ -149,6 +152,7 @@
         } catch (e) {}
       },
       onScreenCaptureStream (stream) {
+        this.stopAllTracks(this.screenCaptureStream)
         this.screenCaptureStream = stream
       },
       setCameraStream (deviceId) {
@@ -159,6 +163,7 @@
         }
         navigator.mediaDevices.getUserMedia(constraints)
           .then(stream => {
+            this.stopAllTracks(this.cameraStream)
             this.cameraStream = stream
           })
       },
@@ -171,6 +176,7 @@
         navigator.mediaDevices.getUserMedia(constraints)
           .then(stream => {
             if (this.audioStream === null) {
+              this.stopAllTracks(this.audioStream)
               this.audioStream = stream
             }
           })

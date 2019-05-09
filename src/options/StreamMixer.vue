@@ -6,6 +6,10 @@
           Preview
         </h5>
         <v-spacer></v-spacer>
+        <div
+          :style="{width: `${audioLevel}px`}"
+          class="vumeter"
+        />
         {{ parseInt(audioLevel) }} <v-icon>volume_up</v-icon>
       </v-card-title>
 

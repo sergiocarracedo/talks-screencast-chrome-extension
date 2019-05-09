@@ -7,8 +7,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 let resolve = dir => path.join(__dirname, '..', 'src', dir)
 module.exports = {
   entry: {
-    options: resolve('./options'),
-    background: resolve('./background.js')
+    options: resolve('./options')
+    // background: resolve('./background.js')
   },
   output: {
     path: path.join(__dirname, '..', 'build'),
@@ -84,7 +84,11 @@ module.exports = {
     ]
   },
   plugins: [
-    htmlPage('options', 'options', ['options']),
+    htmlPage('options', 'options', ['manifest', 'vendor', 'options']),
+    new CopyWebpackPlugin([{
+      from: path.join(__dirname, '..', 'src', 'background.js'),
+      to: 'js/background.js'
+    }]),
     new CopyWebpackPlugin([{ from: path.join(__dirname, '..', 'static') }]),
     new ChromeReloadPlugin({
       port: 9090,

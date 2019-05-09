@@ -156,7 +156,6 @@
 
           navigator.mediaDevices.getUserMedia(constraints)
             .then(stream => {
-              // this.screenCaptureStream = stream
               this.$emit('onScreenCaptureStream', stream)
             })
             .catch(error => console.log(error, error.message))

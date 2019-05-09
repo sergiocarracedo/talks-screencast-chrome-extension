@@ -18,11 +18,6 @@
 
   export default {
     name: 'video-layout',
-    props: {
-      ug: {
-        required: true
-      }
-    },
     data: () => ({
       layoutStream: null
     }),

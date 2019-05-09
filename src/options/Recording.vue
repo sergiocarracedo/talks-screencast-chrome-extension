@@ -48,6 +48,11 @@
       buffer: [],
       file: null
     }),
+    computed: {
+      recordMimeType () {
+        return this.$store.state.recordMimeType
+      }
+    },
     mounted () {
       this.$store.commit('setRecordingStatus', false)
     },
@@ -55,6 +60,15 @@
       this.mediaRecorder.stop()
     },
     methods: {
+      prepareDownload (buffer, forceDownload) {
+        const blob = new Blob(buffer, {
+          type: 'video/webm'
+        })
+        this.file = URL.createObjectURL(blob)
+        if (forceDownload) {
+          this.forceDownload()
+        }
+      },
       startRecording () {
         // Clear buffer
         this.buffer = []
@@ -103,12 +117,7 @@
         this.recording = false
         this.recordingStopTime = new Date()
 
-        const blob = new Blob(this.buffer, {
-          type: 'video/webm'
-        })
-
-        this.file = URL.createObjectURL(blob)
-        this.forceDownload()
+        this.prepareDownload(this.buffer, true)
       },
       onDataAvailable (e) {
         if (e.data) {

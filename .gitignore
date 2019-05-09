@@ -11,3 +11,6 @@ yarn.lock
 # Backpack build
 build
 dist
+
+*.crx
+*.pem
