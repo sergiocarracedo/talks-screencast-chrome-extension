@@ -9,6 +9,16 @@
     <v-container grid-list-md>
       <v-layout justify-center>
         <v-flex xs12 sm8 md8>
+
+          <stream-mixer
+              :layoutStream="layoutStream"
+              :cameraStream="cameraStream"
+              :audioStream="audioStream"
+              :screenCaptureStream="screenCaptureStream"
+              @recordingStatusChange="onRecordingStatusChange"
+          />
+
+
           <v-tabs color="primary" dark class="mb-5">
             <v-tab ripple>
               Sources and Settings
@@ -31,14 +41,6 @@
               <about />
             </v-tab-item>
           </v-tabs>
-
-          <stream-mixer
-            :layoutStream="layoutStream"
-            :cameraStream="cameraStream"
-            :audioStream="audioStream"
-            :screenCaptureStream="screenCaptureStream"
-            @recordingStatusChange="onRecordingStatusChange"
-          />
 
           <stream-layout
             :ug="ug"

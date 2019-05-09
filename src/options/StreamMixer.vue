@@ -93,7 +93,6 @@
 
           // Add audio
           if (this.audioStream) {
-            console.log('audiostream')
             this.mixedStream.getAudioTracks().forEach(track => this.mixedStream.removeTrack(track))
             this.mixedStream.addTrack(this.audioStream.getAudioTracks()[0])
 
