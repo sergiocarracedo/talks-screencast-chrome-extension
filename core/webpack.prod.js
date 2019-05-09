@@ -9,6 +9,9 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const {styleLoaders} = require('./tools')
 module.exports = merge(baseWebpack, {
   devtool: '#cheap-module-eval-source-map',
+  output: {
+    path: path.join(__dirname, '..', 'dist')
+  },
   module: {
     rules: styleLoaders({ extract: true, sourceMap: true })
   },

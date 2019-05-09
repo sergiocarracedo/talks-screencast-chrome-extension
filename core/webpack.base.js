@@ -7,7 +7,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 let resolve = dir => path.join(__dirname, '..', 'src', dir)
 module.exports = {
   entry: {
-    options: resolve('./options')
+    options: resolve('./options'),
+    background: resolve('./background.js')
   },
   output: {
     path: path.join(__dirname, '..', 'build'),
